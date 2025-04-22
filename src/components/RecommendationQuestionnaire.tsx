@@ -1,55 +1,13 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
+import { DialogDescription } from "@/components/ui/dialog";
 import { searchMovies, MovieResult } from "@/services/movieApi";
 import { useMovies } from "@/context/MovieContext";
-import { Loader2, ThumbsUp } from "lucide-react";
-import { DialogDescription } from "@/components/ui/dialog";
-
-type Question = {
-  id: string;
-  text: string;
-  options: {
-    id: string;
-    text: string;
-    genres: string[];
-  }[];
-};
-
-const questions: Question[] = [
-  {
-    id: "mood",
-    text: "What kind of mood are you in today?",
-    options: [
-      { id: "happy", text: "Cheerful and Upbeat", genres: ["comedy", "animation", "family"] },
-      { id: "thoughtful", text: "Thoughtful and Reflective", genres: ["drama", "documentary"] },
-      { id: "excited", text: "Looking for Excitement", genres: ["action", "adventure", "thriller"] },
-      { id: "scared", text: "Want to be Scared", genres: ["horror", "thriller"] },
-    ],
-  },
-  {
-    id: "time",
-    text: "How much time do you have?",
-    options: [
-      { id: "short", text: "Under 2 hours", genres: ["comedy", "thriller", "horror"] },
-      { id: "medium", text: "2-3 hours", genres: ["drama", "action", "adventure"] },
-      { id: "long", text: "I have all day", genres: ["sci-fi", "fantasy"] },
-    ],
-  },
-  {
-    id: "company",
-    text: "Who are you watching with?",
-    options: [
-      { id: "alone", text: "Just myself", genres: ["thriller", "horror", "drama"] },
-      { id: "family", text: "Family", genres: ["family", "animation", "comedy"] },
-      { id: "friends", text: "Friends", genres: ["action", "comedy", "adventure"] },
-      { id: "date", text: "Date night", genres: ["romance", "comedy", "drama"] },
-    ],
-  },
-];
+import { questions } from "./recommendation/types";
+import QuestionsList from "./recommendation/QuestionsList";
+import LoadingState from "./recommendation/LoadingState";
+import MovieRecommendation from "./recommendation/MovieRecommendation";
 
 interface RecommendationQuestionnaireProps {
   open: boolean;
@@ -140,63 +98,17 @@ const RecommendationQuestionnaire = ({ open, onOpenChange }: RecommendationQuest
         </DialogHeader>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-8">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="mt-4 text-center">Finding the perfect movie for you...</p>
-          </div>
+          <LoadingState />
         ) : recommendation ? (
-          <div className="flex flex-col items-center space-y-4">
-            <div className="relative aspect-[2/3] w-48 overflow-hidden rounded-md">
-              {recommendation.poster_path ? (
-                <img 
-                  src={`https://image.tmdb.org/t/p/w342${recommendation.poster_path}`} 
-                  alt={recommendation.title} 
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-muted">
-                  <span className="text-sm">No image available</span>
-                </div>
-              )}
-            </div>
-            
-            <h3 className="text-xl font-bold">{recommendation.title}</h3>
-            
-            <div className="flex items-center gap-2">
-              <ThumbsUp className="h-5 w-5 text-primary" />
-              <span>Based on your preferences</span>
-            </div>
-            
-            <p className="text-sm text-center line-clamp-3">{recommendation.overview}</p>
-            
-            <div className="flex w-full gap-2">
-              <Button variant="outline" onClick={resetQuestionnaire} className="flex-1">
-                Try Again
-              </Button>
-              <Button className="flex-1" asChild>
-                <a href={`/movie/${recommendation.id}`}>See Details</a>
-              </Button>
-            </div>
-          </div>
+          <MovieRecommendation 
+            recommendation={recommendation} 
+            onTryAgain={resetQuestionnaire} 
+          />
         ) : (
-          <div className="space-y-4">
-            <p className="text-lg">{currentQuestion.text}</p>
-            
-            <RadioGroup>
-              {currentQuestion.options.map((option) => (
-                <div key={option.id} className="flex items-center space-x-2">
-                  <RadioGroupItem 
-                    id={option.id} 
-                    value={option.id} 
-                    onClick={() => handleAnswer(option.id)}
-                  />
-                  <Label htmlFor={option.id} className="cursor-pointer flex-1 py-2">
-                    {option.text}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
+          <QuestionsList 
+            currentQuestion={currentQuestion} 
+            onAnswer={handleAnswer} 
+          />
         )}
       </DialogContent>
     </Dialog>
