@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { searchMovies, MovieResult } from "@/services/movieApi";
 import { useMovies } from "@/context/MovieContext";
 import { Loader2, ThumbsUp } from "lucide-react";
+import { DialogDescription } from "@/components/ui/dialog";
 
 type Question = {
   id: string;
@@ -65,19 +66,18 @@ const RecommendationQuestionnaire = ({ open, onOpenChange }: RecommendationQuest
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
-  const handleAnswer = (optionId: string) => {
+  const handleAnswer = async (optionId: string) => {
     setAnswers({ ...answers, [currentQuestion.id]: optionId });
     
     if (isLastQuestion) {
-      generateRecommendation(optionId);
+      setLoading(true);
+      await generateRecommendation(optionId);
     } else {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
   const generateRecommendation = async (lastOptionId: string) => {
-    setLoading(true);
-    
     // Collect all selected genres based on answers
     const selectedGenres = new Set<string>();
     
@@ -134,10 +134,13 @@ const RecommendationQuestionnaire = ({ open, onOpenChange }: RecommendationQuest
           <DialogTitle>
             {recommendation ? "Your Recommendation" : "Find Your Perfect Movie"}
           </DialogTitle>
+          <DialogDescription>
+            {!recommendation && !loading && `Question ${currentQuestionIndex + 1} of ${questions.length}`}
+          </DialogDescription>
         </DialogHeader>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-12">
+          <div className="flex flex-col items-center justify-center py-8">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
             <p className="mt-4 text-center">Finding the perfect movie for you...</p>
           </div>

@@ -8,6 +8,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  TooltipProvider
 } from "@/components/ui/tooltip";
 import RecommendationQuestionnaire from "./RecommendationQuestionnaire";
 
@@ -49,22 +50,24 @@ const Navbar = ({ onSearch }: NavbarProps) => {
           </form>
           
           <div className="flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  onClick={() => setRecommendationOpen(true)}
-                  className="text-primary"
-                >
-                  <Sparkles className="h-5 w-5" />
-                  <span className="sr-only">Get Movie Recommendations</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Get Movie Recommendations</p>
-              </TooltipContent>
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => setRecommendationOpen(true)}
+                    className="text-primary"
+                  >
+                    <Sparkles className="h-5 w-5" />
+                    <span className="sr-only">Get Movie Recommendations</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Get Movie Recommendations</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             
             <Link to="/collection">
               <Button variant="outline">My Collection</Button>
